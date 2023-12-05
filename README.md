@@ -20,4 +20,4 @@ One day I will learn CMake, but today is not that day.
 
 I've got a spinning cube with a brick texture, the z-filtering has not yet bee implemented and the faces are currently a little jacked up.
 
-<img src='https://github.com/NayrMu/LatestXLaunch/blob/master/LatestXLaunch.gif' title='Video Demo' width='' alt='Video Demo' />
+<img src='https://github.com/NayrMu/LearnOpenGL/blob/master/LOGL_122523.gif' title='Video Demo' width='' alt='Video Demo' />
