@@ -1,3 +1,4 @@
+
 #include "shader.h"
 
 #include <stdlib.h>
@@ -67,4 +68,10 @@ void shader_setInt(const Shader* shader, const char* name, int value) {
 
 void shader_setFloat(const Shader* shader, const char* name, float value) {
   glUniform1f(glGetUniformLocation(shader->ID, name), value);
+}
+
+void shader_setMat4(const Shader* shader, const char* name,
+                    struct mat4 mat) {
+  glUniformMatrix4fv(glGetUniformLocation(shader->ID, name), 1, GL_FALSE,
+                     mat.m);
 }

@@ -150,13 +150,20 @@
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\main.c" />
     <ClCompile Include="src\Shader.c" />
+    <ClCompile Include="src\STBIMAGE.c" />
+    <ClCompile Include="src\vMaths.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\vMaths.h" />
     <ClInclude Include="src\Shader.h" />
+    <ClInclude Include="src\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\fragmentShader.txt" />
     <Text Include="src\vertexShader.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="src\wall.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

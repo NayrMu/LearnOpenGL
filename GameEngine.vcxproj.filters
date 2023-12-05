@@ -24,14 +24,31 @@
     <ClCompile Include="src\Shader.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\STBIMAGE.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vMaths.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vMaths.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\vertexShader.txt" />
     <Text Include="src\fragmentShader.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="src\wall.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
