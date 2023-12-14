@@ -1,0 +1,32 @@
+[
+{
+  "directory": "C:/Users/rkmun/source/repos/LearnOpenGL/build/src",
+  "command": "C:\\msys64\\ucrt64\\bin\\gcc.exe  @CMakeFiles/source_files.dir/includes_C.rsp -g -o CMakeFiles\\source_files.dir\\main.c.obj -c C:\\Users\\rkmun\\source\\repos\\LearnOpenGL\\src\\main.c",
+  "file": "C:/Users/rkmun/source/repos/LearnOpenGL/src/main.c",
+  "output": "src/CMakeFiles/source_files.dir/main.c.obj"
+},
+{
+  "directory": "C:/Users/rkmun/source/repos/LearnOpenGL/build/src",
+  "command": "C:\\msys64\\ucrt64\\bin\\gcc.exe  @CMakeFiles/source_files.dir/includes_C.rsp -g -o CMakeFiles\\source_files.dir\\glad.c.obj -c C:\\Users\\rkmun\\source\\repos\\LearnOpenGL\\src\\glad.c",
+  "file": "C:/Users/rkmun/source/repos/LearnOpenGL/src/glad.c",
+  "output": "src/CMakeFiles/source_files.dir/glad.c.obj"
+},
+{
+  "directory": "C:/Users/rkmun/source/repos/LearnOpenGL/build/src",
+  "command": "C:\\msys64\\ucrt64\\bin\\gcc.exe  @CMakeFiles/source_files.dir/includes_C.rsp -g -o CMakeFiles\\source_files.dir\\Shader.c.obj -c C:\\Users\\rkmun\\source\\repos\\LearnOpenGL\\src\\Shader.c",
+  "file": "C:/Users/rkmun/source/repos/LearnOpenGL/src/Shader.c",
+  "output": "src/CMakeFiles/source_files.dir/Shader.c.obj"
+},
+{
+  "directory": "C:/Users/rkmun/source/repos/LearnOpenGL/build/src",
+  "command": "C:\\msys64\\ucrt64\\bin\\gcc.exe  @CMakeFiles/source_files.dir/includes_C.rsp -g -o CMakeFiles\\source_files.dir\\STBIMAGE.c.obj -c C:\\Users\\rkmun\\source\\repos\\LearnOpenGL\\src\\STBIMAGE.c",
+  "file": "C:/Users/rkmun/source/repos/LearnOpenGL/src/STBIMAGE.c",
+  "output": "src/CMakeFiles/source_files.dir/STBIMAGE.c.obj"
+},
+{
+  "directory": "C:/Users/rkmun/source/repos/LearnOpenGL/build/src",
+  "command": "C:\\msys64\\ucrt64\\bin\\gcc.exe  @CMakeFiles/source_files.dir/includes_C.rsp -g -o CMakeFiles\\source_files.dir\\vMaths.c.obj -c C:\\Users\\rkmun\\source\\repos\\LearnOpenGL\\src\\vMaths.c",
+  "file": "C:/Users/rkmun/source/repos/LearnOpenGL/src/vMaths.c",
+  "output": "src/CMakeFiles/source_files.dir/vMaths.c.obj"
+}
+]

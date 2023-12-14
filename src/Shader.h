@@ -19,6 +19,6 @@ void shader_setBool(const Shader* shader, const char* name, int value);
 void shader_setInt(const Shader* shader, const char* name, int value);
 void shader_setFloat(const Shader* shader, const char* name, float value);
 void shader_setMat4(const Shader* shader, const char* name,
-                    const float* matrix);
+                    struct mat4 mat);
 
 #endif  // !SHADER_H

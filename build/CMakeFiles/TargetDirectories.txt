@@ -1,0 +1,5 @@
+C:/Users/rkmun/source/repos/LearnOpenGL/build/CMakeFiles/edit_cache.dir
+C:/Users/rkmun/source/repos/LearnOpenGL/build/CMakeFiles/rebuild_cache.dir
+C:/Users/rkmun/source/repos/LearnOpenGL/build/src/CMakeFiles/source_files.dir
+C:/Users/rkmun/source/repos/LearnOpenGL/build/src/CMakeFiles/edit_cache.dir
+C:/Users/rkmun/source/repos/LearnOpenGL/build/src/CMakeFiles/rebuild_cache.dir
