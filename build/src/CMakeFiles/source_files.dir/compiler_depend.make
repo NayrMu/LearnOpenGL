@@ -376,8 +376,12 @@ src/CMakeFiles/source_files.dir/main.c.obj: C:/Users/rkmun/source/repos/LearnOpe
   C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/stdint.h \
   C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/syslimits.h \
   C:/Users/rkmun/source/repos/LearnOpenGL/src/Shader.h \
+  C:/Users/rkmun/source/repos/LearnOpenGL/src/randGen.h \
   C:/Users/rkmun/source/repos/LearnOpenGL/src/stb_image.h \
   C:/Users/rkmun/source/repos/LearnOpenGL/src/vMaths.h
+
+src/CMakeFiles/source_files.dir/randGen.c.obj: C:/Users/rkmun/source/repos/LearnOpenGL/src/randGen.c \
+  C:/Users/rkmun/source/repos/LearnOpenGL/src/randGen.h
 
 src/CMakeFiles/source_files.dir/vMaths.c.obj: C:/Users/rkmun/source/repos/LearnOpenGL/src/vMaths.c \
   C:/msys64/ucrt64/include/_mingw.h \
@@ -927,6 +931,8 @@ C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/serializeintrin.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/sgxintrin.h:
 
+C:/Users/rkmun/source/repos/LearnOpenGL/src/randGen.h:
+
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/tsxldtrkintrin.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/vaesintrin.h:
@@ -950,5 +956,7 @@ C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/xtestintrin.h:
 C:/Users/rkmun/source/repos/LearnOpenGL/src/main.c:
 
 C:/Users/rkmun/source/repos/LearnOpenGL/Dependencies/include/GLFW/glfw3.h:
+
+C:/Users/rkmun/source/repos/LearnOpenGL/src/randGen.c:
 
 C:/Users/rkmun/source/repos/LearnOpenGL/src/vMaths.c:

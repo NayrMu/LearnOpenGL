@@ -7,6 +7,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/source_files.dir/glad.c.obj.d"
   "CMakeFiles/source_files.dir/main.c.obj"
   "CMakeFiles/source_files.dir/main.c.obj.d"
+  "CMakeFiles/source_files.dir/randGen.c.obj"
+  "CMakeFiles/source_files.dir/randGen.c.obj.d"
   "CMakeFiles/source_files.dir/vMaths.c.obj"
   "CMakeFiles/source_files.dir/vMaths.c.obj.d"
   "libsource_files.dll.a"

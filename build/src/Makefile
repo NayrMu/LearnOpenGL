@@ -225,6 +225,30 @@ main.c.s:
 	cd /d C:\Users\rkmun\source\repos\LearnOpenGL\build && $(MAKE) $(MAKESILENT) -f src\CMakeFiles\source_files.dir\build.make src/CMakeFiles/source_files.dir/main.c.s
 .PHONY : main.c.s
 
+randGen.obj: randGen.c.obj
+.PHONY : randGen.obj
+
+# target to build an object file
+randGen.c.obj:
+	cd /d C:\Users\rkmun\source\repos\LearnOpenGL\build && $(MAKE) $(MAKESILENT) -f src\CMakeFiles\source_files.dir\build.make src/CMakeFiles/source_files.dir/randGen.c.obj
+.PHONY : randGen.c.obj
+
+randGen.i: randGen.c.i
+.PHONY : randGen.i
+
+# target to preprocess a source file
+randGen.c.i:
+	cd /d C:\Users\rkmun\source\repos\LearnOpenGL\build && $(MAKE) $(MAKESILENT) -f src\CMakeFiles\source_files.dir\build.make src/CMakeFiles/source_files.dir/randGen.c.i
+.PHONY : randGen.c.i
+
+randGen.s: randGen.c.s
+.PHONY : randGen.s
+
+# target to generate assembly for a file
+randGen.c.s:
+	cd /d C:\Users\rkmun\source\repos\LearnOpenGL\build && $(MAKE) $(MAKESILENT) -f src\CMakeFiles\source_files.dir\build.make src/CMakeFiles/source_files.dir/randGen.c.s
+.PHONY : randGen.c.s
+
 vMaths.obj: vMaths.c.obj
 .PHONY : vMaths.obj
 
@@ -270,6 +294,9 @@ help:
 	@echo ... main.obj
 	@echo ... main.i
 	@echo ... main.s
+	@echo ... randGen.obj
+	@echo ... randGen.i
+	@echo ... randGen.s
 	@echo ... vMaths.obj
 	@echo ... vMaths.i
 	@echo ... vMaths.s

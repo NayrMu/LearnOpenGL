@@ -6,6 +6,7 @@
 #include "stb_image.h"
 #include "Shader.h"
 #include "vMaths.h"
+#include "randGen.h"
 
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
@@ -67,8 +68,10 @@ int main() {
     glfwTerminate();
     return -1;
   }
+  
   glfwMakeContextCurrent(window);
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+  
 
   // Variables for FPS calculation
   double startTime = glfwGetTime();
@@ -86,20 +89,7 @@ int main() {
   // ------------------------------------
   Shader shader = shader_create(vertexShaderSource, fragmentShaderSouce);
   
-
-  struct v4 vec = {1.0f, 0.0f, 0.0f, 1.0f};
-  struct mat4 trans = makeIdentityMatrix();
-  struct v3 vec3 = {1.0f, 1.0f, 0.0f};
-  //translate(&trans, vec3);
-  multiplyVectorMatrix(&vec, trans);
-
-  struct quaternion quat;
-  struct v3 rotAxis = {0, 0, 1};
-
-  struct v3 scaleVec = {0.5, 0.5, 0.5};
-
-  scale(scaleVec, &trans);
-  //quatRot(quat, &trans);
+  
   
 
   
@@ -129,7 +119,38 @@ int main() {
       0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
       -0.5f, 0.5f,  0.5f,  0.0f, 0.0f, -0.5f, 0.5f,  -0.5f, 0.0f, 1.0f
   };
+  float worldMat[2][2][2] = {
+    {{1.0f, 1.0f},
+     {1.0f, 1.0f},},
+     {{1.0f, 0.0f},
+     {0.0f, 0.0f},},
+  };
+  int worldSize = 8;
+  int axisSize = 2;
+  struct v4 transforms[worldSize];
+  int counter = 0;
+  for (int i = 0; i < axisSize; i++) {
+    for (int j = 0; j < axisSize; j++) {
+      for (int k = 0; k < axisSize; k++) {
+        struct v4 currentVector;
+        currentVector.y = (float)i - 0.5f;
+        currentVector.z = (float)j - 0.5f;
+        currentVector.x = (float)k - 0.5f;
+        currentVector.w = 1.0f;
+        if (worldMat[i][j][k] != 1.0f) {
+          currentVector.w = -1.0f; 
+        }
+        transforms[counter] = currentVector;
+        counter++;
+      }
+    }
+  }
 
+  printf("%f %f %f\n%ff %f %f\n %f %f %f", transforms[0].x, transforms[0].y, transforms[0].z, transforms[1].x, transforms[1].y, transforms[1].z, transforms[2].x, transforms[2].y, transforms[2].z);
+  unsigned int num1 = NoiseGen(1000, 9999, 1234567);
+  unsigned int num2 = NoiseGen(1000, 9999, 9964921);
+  unsigned int num3 = NoiseGen(1000, 9999, 92345678);
+  printf("%i %i %i", num1, num2, num3);
   unsigned int VBO, VAO;
   glGenVertexArrays(1, &VAO);
   glGenBuffers(1, &VBO);
@@ -179,10 +200,6 @@ int main() {
     glGenerateMipmap(GL_TEXTURE_2D);
   } else {
     printf("Failed to load texture\n%s", stbi_failure_reason());
-    GLenum error = glGetError();
-    if (error != GL_NO_ERROR) {
-        printf("OpenGL error: %d\n", error);
-    }
   }
   stbi_image_free(data);
 
@@ -191,49 +208,69 @@ int main() {
   struct v3 zAxis = {0.0f, 0.0f, 1.0f};
 
   
-
+  
   // render loop
   // -----------
   while (!glfwWindowShouldClose(window)) {
+    
+    
     // input
     // -----
     processInput(window);
+    
 
     // render
     // ------
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);\
     glEnable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
 
 
     // bind Texture
     glBindTexture(GL_TEXTURE_2D, texture);
+    
 
-    struct mat4 model = makeIdentityMatrix();
+    
 
     struct quaternion cameraQuat;
-    axisAngleToQuaternion(&xAxis, (float)glfwGetTime() * (-55.0f * (3.14 / 180)), &cameraQuat);
-    quatRot(cameraQuat, &model);
+    
 
     struct mat4 view = makeIdentityMatrix();
-    struct v3 cameraVec = {0.0f, 0.0f, -3.0f};
+    struct v3 cameraVec = {0.0f, -2.0f, -10.0f};
     translate(cameraVec, &view);
 
     struct mat4 projection = makeIdentityMatrix();
     makeProjection(45.0f, 0.1f, 100.0f, &projection, (float)SCR_WIDTH,
                    (float)SCR_HEIGHT);
 
-    int modelLoc = glGetUniformLocation(shader.ID, "model");
-    glUniformMatrix4fv(modelLoc, 1, GL_TRUE, &model.m);
     int viewLoc = glGetUniformLocation(shader.ID, "view");
     glUniformMatrix4fv(viewLoc, 1, GL_TRUE, &view.m);
     int projectionLoc = glGetUniformLocation(shader.ID, "projection");
     glUniformMatrix4fv(projectionLoc, 1, GL_TRUE, &projection.m);
-
+    
     // render container
     shader_use(&shader);
+    
+    
     glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+    
+    for(unsigned int i = 0; i < worldSize; i++)
+    {
+      if (transforms[i].w != -1) {
+        struct mat4 model = makeIdentityMatrix();
+        axisAngleToQuaternion(&xAxis, (30.0f * (3.14 / 180)), &cameraQuat);
+        
+        struct v3 renderVector = {transforms[i].x, transforms[i].y, transforms[i].z};
+        translate(renderVector, &model);
+        quatRot(cameraQuat, &model);
+        int modelLoc = glGetUniformLocation(shader.ID, "model");
+        
+        glUniformMatrix4fv(modelLoc, 1, GL_TRUE, &model.m);
+
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+      }
+    }
 
     frameCount++;
 

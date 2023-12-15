@@ -28,5 +28,11 @@
   "command": "C:\\msys64\\ucrt64\\bin\\gcc.exe  @CMakeFiles/source_files.dir/includes_C.rsp -g -o CMakeFiles\\source_files.dir\\vMaths.c.obj -c C:\\Users\\rkmun\\source\\repos\\LearnOpenGL\\src\\vMaths.c",
   "file": "C:/Users/rkmun/source/repos/LearnOpenGL/src/vMaths.c",
   "output": "src/CMakeFiles/source_files.dir/vMaths.c.obj"
+},
+{
+  "directory": "C:/Users/rkmun/source/repos/LearnOpenGL/build/src",
+  "command": "C:\\msys64\\ucrt64\\bin\\gcc.exe  @CMakeFiles/source_files.dir/includes_C.rsp -g -o CMakeFiles\\source_files.dir\\randGen.c.obj -c C:\\Users\\rkmun\\source\\repos\\LearnOpenGL\\src\\randGen.c",
+  "file": "C:/Users/rkmun/source/repos/LearnOpenGL/src/randGen.c",
+  "output": "src/CMakeFiles/source_files.dir/randGen.c.obj"
 }
 ]

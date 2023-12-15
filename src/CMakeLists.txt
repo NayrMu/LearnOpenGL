@@ -8,6 +8,8 @@ add_executable(source_files
     "STBIMAGE.c"
     "vMaths.c"
     "vMaths.h"
+    "randGen.c"
+    "randGen.h"
 )
 
 

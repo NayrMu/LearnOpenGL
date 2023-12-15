@@ -29,4 +29,5 @@ src/CMakeFiles/source_files.dir/main.c.obj: \
  C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/mm_malloc.h \
  C:/msys64/ucrt64/include/errno.h \
  C:\Users\rkmun\source\repos\LearnOpenGL\src\Shader.h \
- C:\Users\rkmun\source\repos\LearnOpenGL\src\vMaths.h
+ C:\Users\rkmun\source\repos\LearnOpenGL\src\vMaths.h \
+ C:\Users\rkmun\source\repos\LearnOpenGL\src\randGen.h
