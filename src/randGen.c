@@ -1,4 +1,6 @@
 #include "randGen.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 unsigned int NoiseGen(int min, int max, unsigned int seed) {
     int nums[4] = {};
@@ -27,3 +29,27 @@ unsigned int NoiseGen(int min, int max, unsigned int seed) {
 
 }
 
+void newSeed(unsigned int* seed) {
+    *seed = rand() % 9999999;
+}
+
+void createN3dArray(int n, unsigned int seed, int gameWorld[64][64][64]) {
+
+    int rNum;
+    char Srnum[9];
+    sprintf(Srnum, "%d", rNum);
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            for (int k = 0; k < n; k++) {
+                rNum = NoiseGen(100000000, 999999999, seed);
+                sprintf(Srnum, "%d", rNum);
+                int index = rand() % 9;
+                int temp = (Srnum[index]) - '0';
+                if ( temp > 2) {
+                    gameWorld[i][j][k] = 1;
+                }
+                else { gameWorld[i][j][k] = 0; }
+            }
+        }
+    }
+}

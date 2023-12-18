@@ -19,6 +19,10 @@ double calculateFPS(double elapsedTime, int *frameCount);
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
+int worldMat[64][64][64];
+unsigned int seed = 233125123;
+struct v4 transforms[262144];
+
 struct v3 cameraPos = {0.0f, 2.0f, 10.0f};
 struct v3 cameraFront = {0.0f, 0.0f, -1.0f};
 struct v3 cameraTarget = {0.0f, 0.0f, 0.0f};
@@ -145,20 +149,12 @@ int main() {
       0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
       -0.5f, 0.5f,  0.5f,  0.0f, 0.0f, -0.5f, 0.5f,  -0.5f, 0.0f, 1.0f
   };
-  float worldMat[3][3][3] = {
-    {{1.0f, 1.0f, 1.0f},
-    {1.0f, 1.0f, 1.0f},
-     {1.0f, 1.0f, 1.0f}},
-     {{1.0f, 1.0f, 0.0f},
-     {0.0f, 0.0f, 0.0f},
-     {0.0f, 0.0f, 0.0f}},
-     {{1.0f, 0.0f, 0.0f},
-     {0.0f, 0.0f, 0.0f},
-     {0.0f, 0.0f, 0.0f}}
-  };
-  int worldSize = 27;
-  int axisSize = 3;
-  struct v4 transforms[worldSize];
+  
+  
+  createN3dArray(64, seed, worldMat);
+  int worldSize = 262144;
+  int axisSize = 64;
+  
   int counter = 0;
   for (int i = 0; i < axisSize; i++) {
     for (int j = 0; j < axisSize; j++) {
@@ -168,7 +164,7 @@ int main() {
         currentVector.z = (float)j - 0.5f;
         currentVector.x = (float)k - 0.5f;
         currentVector.w = 1.0f;
-        if (worldMat[i][j][k] != 1.0f) {
+        if (worldMat[i][j][k] != 1) {
           currentVector.w = -1.0f; 
         }
         transforms[counter] = currentVector;
@@ -385,6 +381,28 @@ void processInput(GLFWwindow *window) {
     normalize3d(&vecA);
     VscalarMulitply(cameraSpeed, vecA, &vecA);
     subtractVectors(cameraPos, vecA, &cameraPos);
+  }
+  if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
+    newSeed(&seed);
+    createN3dArray(64, seed, worldMat);
+    int counter = 0;
+    int axisSize = 64;
+    for (int i = 0; i < axisSize; i++) {
+      for (int j = 0; j < axisSize; j++) {
+        for (int k = 0; k < axisSize; k++) {
+          struct v4 currentVector;
+          currentVector.y = (float)i - 0.5f;
+          currentVector.z = (float)j - 0.5f;
+          currentVector.x = (float)k - 0.5f;
+          currentVector.w = 1.0f;
+          if (worldMat[i][j][k] != 1) {
+            currentVector.w = -1.0f; 
+          }
+          transforms[counter] = currentVector;
+          counter++;
+        }
+      }
+    }
   }
 }
 
