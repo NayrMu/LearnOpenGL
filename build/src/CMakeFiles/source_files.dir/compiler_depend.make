@@ -372,6 +372,7 @@ src/CMakeFiles/source_files.dir/main.c.obj: C:/Users/rkmun/source/repos/LearnOpe
   C:/msys64/ucrt64/include/vadefs.h \
   C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/limits.h \
   C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/mm_malloc.h \
+  C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/stdbool.h \
   C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/stddef.h \
   C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/stdint.h \
   C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/syslimits.h \
@@ -956,6 +957,8 @@ C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/xtestintrin.h:
 C:/Users/rkmun/source/repos/LearnOpenGL/src/main.c:
 
 C:/Users/rkmun/source/repos/LearnOpenGL/Dependencies/include/GLFW/glfw3.h:
+
+C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/stdbool.h:
 
 C:/Users/rkmun/source/repos/LearnOpenGL/src/randGen.c:
 

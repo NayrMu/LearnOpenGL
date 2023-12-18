@@ -26,3 +26,4 @@ unsigned int NoiseGen(int min, int max, unsigned int seed) {
     return seed;
 
 }
+

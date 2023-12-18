@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <math.h>
+#include <stdbool.h>
 #include "stb_image.h"
 #include "Shader.h"
 #include "vMaths.h"
@@ -10,12 +11,35 @@
 
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void processInput(GLFWwindow *window);
 double calculateFPS(double elapsedTime, int *frameCount);
 
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
+
+struct v3 cameraPos = {0.0f, 2.0f, 10.0f};
+struct v3 cameraFront = {0.0f, 0.0f, -1.0f};
+struct v3 cameraTarget = {0.0f, 0.0f, 0.0f};
+struct v3 lookDirection;
+struct v3 xAxis = {1.0f, 0.0f, 0.0f};
+struct v3 yAxis = {0.0f, 1.0f, 0.0f};
+struct v3 zAxis = {0.0f, 0.0f, 1.0f};
+struct v3 lookVec;
+
+bool firstMouse = true;
+float yaw   = -90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
+float pitch =  0.0f;
+float lastX =  800.0f / 2.0;
+float lastY =  600.0 / 2.0;
+float fov   =  45.0f;
+
+float currentTime;
+float elapsedTime;
+float lastTime;
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
 
 const char *vertexShaderSource = 
     "#version 330 core\n"
@@ -71,11 +95,13 @@ int main() {
   
   glfwMakeContextCurrent(window);
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+  glfwSetCursorPosCallback(window, mouse_callback);
+  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);  
   
-
+  glfwSetInputMode(window, GLFW_REPEAT, GLFW_FALSE);
   // Variables for FPS calculation
-  double startTime = glfwGetTime();
-  double lastTime = startTime;
+  float startTime = glfwGetTime();
+  lastTime = startTime;
   int frameCount = 0;
 
   // glad: load all OpenGL function pointers
@@ -119,14 +145,19 @@ int main() {
       0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
       -0.5f, 0.5f,  0.5f,  0.0f, 0.0f, -0.5f, 0.5f,  -0.5f, 0.0f, 1.0f
   };
-  float worldMat[2][2][2] = {
-    {{1.0f, 1.0f},
-     {1.0f, 1.0f},},
-     {{1.0f, 0.0f},
-     {0.0f, 0.0f},},
+  float worldMat[3][3][3] = {
+    {{1.0f, 1.0f, 1.0f},
+    {1.0f, 1.0f, 1.0f},
+     {1.0f, 1.0f, 1.0f}},
+     {{1.0f, 1.0f, 0.0f},
+     {0.0f, 0.0f, 0.0f},
+     {0.0f, 0.0f, 0.0f}},
+     {{1.0f, 0.0f, 0.0f},
+     {0.0f, 0.0f, 0.0f},
+     {0.0f, 0.0f, 0.0f}}
   };
-  int worldSize = 8;
-  int axisSize = 2;
+  int worldSize = 27;
+  int axisSize = 3;
   struct v4 transforms[worldSize];
   int counter = 0;
   for (int i = 0; i < axisSize; i++) {
@@ -193,7 +224,7 @@ int main() {
   // load and generate the texture
   int width, height, nrChannels;
   unsigned char *data =
-      stbi_load("C:\\Users\\rkmun\\source\\repos\\LearnOpenGL\\src\\wall.jpg", &width, &height, &nrChannels, 0);
+      stbi_load("C:\\Users\\rkmun\\source\\repos\\LearnOpenGL\\src\\grass.jpg", &width, &height, &nrChannels, 0);
   if (data) {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
                  GL_UNSIGNED_BYTE, data);
@@ -203,12 +234,15 @@ int main() {
   }
   stbi_image_free(data);
 
-  struct v3 xAxis = {1.0f, 0.0f, 0.0f};
-  struct v3 yAxis = {0.0f, 1.0f, 0.0f};
-  struct v3 zAxis = {0.0f, 0.0f, 1.0f};
+  
 
   
+  struct mat4 projection = makeIdentityMatrix();
+    makeProjection(45.0f, 0.1f, 100.0f, &projection, (float)SCR_WIDTH,
+                   (float)SCR_HEIGHT);
   
+  int projectionLoc = glGetUniformLocation(shader.ID, "projection");
+  glUniformMatrix4fv(projectionLoc, 1, GL_TRUE, &projection.m);
   // render loop
   // -----------
   while (!glfwWindowShouldClose(window)) {
@@ -230,20 +264,11 @@ int main() {
     // bind Texture
     glBindTexture(GL_TEXTURE_2D, texture);
     
-
+    struct mat4 view;
     
-
-    struct quaternion cameraQuat;
+    addVectors(cameraPos, cameraFront, &lookVec);
+    makeLookAtMatrix(cameraPos, lookVec, yAxis, &view);
     
-
-    struct mat4 view = makeIdentityMatrix();
-    struct v3 cameraVec = {0.0f, -2.0f, -10.0f};
-    translate(cameraVec, &view);
-
-    struct mat4 projection = makeIdentityMatrix();
-    makeProjection(45.0f, 0.1f, 100.0f, &projection, (float)SCR_WIDTH,
-                   (float)SCR_HEIGHT);
-
     int viewLoc = glGetUniformLocation(shader.ID, "view");
     glUniformMatrix4fv(viewLoc, 1, GL_TRUE, &view.m);
     int projectionLoc = glGetUniformLocation(shader.ID, "projection");
@@ -259,11 +284,9 @@ int main() {
     {
       if (transforms[i].w != -1) {
         struct mat4 model = makeIdentityMatrix();
-        axisAngleToQuaternion(&xAxis, (30.0f * (3.14 / 180)), &cameraQuat);
         
         struct v3 renderVector = {transforms[i].x, transforms[i].y, transforms[i].z};
         translate(renderVector, &model);
-        quatRot(cameraQuat, &model);
         int modelLoc = glGetUniformLocation(shader.ID, "model");
         
         glUniformMatrix4fv(modelLoc, 1, GL_TRUE, &model.m);
@@ -282,8 +305,13 @@ int main() {
     glfwPollEvents();
 
     // Calculate elapsed time
-    double currentTime = glfwGetTime();
-    double elapsedTime = currentTime - lastTime;
+    currentTime = glfwGetTime();
+    elapsedTime = currentTime - lastTime;
+
+    float currentFrame = glfwGetTime();
+    deltaTime = currentFrame - lastFrame;
+    lastFrame = currentFrame;  
+    
 
     // Update FPS every second
     if (elapsedTime >= 1.0) {
@@ -319,10 +347,80 @@ int main() {
 // frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
 void processInput(GLFWwindow *window) {
-  if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+  if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS){
     glfwSetWindowShouldClose(window, 1);
+  }
+  float cameraSpeed = 4.5f * deltaTime; // adjust accordingly
+  struct v3 vecA;
+  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+    VscalarMulitply(cameraSpeed, cameraFront, &vecA);
+    addVectors(cameraPos, vecA, &cameraPos);
+  }
+    //normalize3d(&cameraPos);
+  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+    VscalarMulitply(cameraSpeed, cameraFront, &vecA);
+    subtractVectors(cameraPos, vecA, &cameraPos);
+  }
+    //normalize3d(&cameraPos);
+  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+    crossProduct(cameraFront, yAxis, &vecA);
+    normalize3d(&vecA);
+    VscalarMulitply(cameraSpeed, vecA, &vecA);
+    subtractVectors(cameraPos, vecA, &cameraPos);
+  }
+  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+    crossProduct(cameraFront, yAxis, &vecA);
+    normalize3d(&vecA);
+    VscalarMulitply(cameraSpeed, vecA, &vecA);
+    addVectors(cameraPos, vecA, &cameraPos);
+  }
+  if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+    crossProduct(cameraFront, xAxis, &vecA);
+    normalize3d(&vecA);
+    VscalarMulitply(cameraSpeed, vecA, &vecA);
+    addVectors(cameraPos, vecA, &cameraPos);
+  }
+  if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+    crossProduct(cameraFront, xAxis, &vecA);
+    normalize3d(&vecA);
+    VscalarMulitply(cameraSpeed, vecA, &vecA);
+    subtractVectors(cameraPos, vecA, &cameraPos);
+  }
 }
 
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+{
+    if (firstMouse)
+    {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+  
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos; 
+    lastX = xpos;
+    lastY = ypos;
+
+    float sensitivity = 0.1f;
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+
+    yaw   += xoffset;
+    pitch += yoffset;
+
+    if(pitch > 89.0f)
+        pitch = 89.0f;
+    if(pitch < -89.0f)
+        pitch = -89.0f;
+
+    struct v3 direction;
+    direction.x = cos(yaw * (3.14159 / 180)) * cos(pitch * (3.14159 / 180));
+    direction.y = sin(pitch * (3.14159 / 180));
+    direction.z = sin(yaw * (3.14159 / 180)) * cos(pitch * (3.14159 / 180));
+    normalize3d(&direction);
+    cameraFront = direction;
+}  
 // glfw: whenever the window size changed (by OS or user resize) this callback
 // function executes
 // ---------------------------------------------------------------------------------------------
