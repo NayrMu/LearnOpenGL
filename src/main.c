@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdbool.h>
+#include <string.h>
+
 #include "stb_image.h"
 #include "Shader.h"
 #include "vMaths.h"
@@ -19,9 +21,9 @@ double calculateFPS(double elapsedTime, int *frameCount);
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-int worldMat[64][64][64];
-unsigned int seed = 233125123;
-struct v4 transforms[262144];
+int worldMat[16][16][16];
+unsigned int seed = 3125123;
+struct v4 transforms[4096];
 
 struct v3 cameraPos = {0.0f, 2.0f, 10.0f};
 struct v3 cameraFront = {0.0f, 0.0f, -1.0f};
@@ -151,23 +153,32 @@ int main() {
   };
   
   
-  createN3dArray(64, seed, worldMat);
-  int worldSize = 262144;
-  int axisSize = 64;
+  createN3dArray(16, seed, worldMat);
+  int worldSize = 4096;
+  int axisSize = 16;
   
   int counter = 0;
   for (int i = 0; i < axisSize; i++) {
     for (int j = 0; j < axisSize; j++) {
       for (int k = 0; k < axisSize; k++) {
         struct v4 currentVector;
-        currentVector.y = (float)i - 0.5f;
+        currentVector.x = (float)i - 0.5f;
         currentVector.z = (float)j - 0.5f;
-        currentVector.x = (float)k - 0.5f;
-        currentVector.w = 1.0f;
-        if (worldMat[i][j][k] != 1) {
-          currentVector.w = -1.0f; 
-        }
+        currentVector.y = (float)k - 0.5f;
+        currentVector.w = -1.0f;
         transforms[counter] = currentVector;
+        if (worldMat[i][j][k] == 2) {
+          transforms[counter].w = 2.0f;
+        }
+        else if (worldMat[i][j][k] == 3) {
+          transforms[counter].w = 3.0f;
+        }
+        else if (worldMat[i][j][k] == 4) {
+          transforms[counter].w = 4.0f;
+        }
+        else if (worldMat[i][j][k] == 1) {
+          transforms[counter].w = 1.0f;
+        }
         counter++;
       }
     }
@@ -230,6 +241,72 @@ int main() {
   }
   stbi_image_free(data);
 
+  unsigned int textureDirt;
+  glGenTextures(1, &textureDirt);
+  glBindTexture(GL_TEXTURE_2D, textureDirt);
+  // set the texture wrapping/filtering options (on the currently bound texture
+  // object)
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                  GL_LINEAR_MIPMAP_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  // load and generate the texture
+  unsigned char *dataDirt =
+      stbi_load("C:\\Users\\rkmun\\source\\repos\\LearnOpenGL\\src\\dirt.jpg", &width, &height, &nrChannels, 0);
+  if (dataDirt) {
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
+                 GL_UNSIGNED_BYTE, dataDirt);
+    glGenerateMipmap(GL_TEXTURE_2D);
+  } else {
+    printf("Failed to load texture\n%s", stbi_failure_reason());
+  }
+  stbi_image_free(dataDirt);
+
+  unsigned int textureStone;
+  glGenTextures(1, &textureStone);
+  glBindTexture(GL_TEXTURE_2D, textureStone);
+  // set the texture wrapping/filtering options (on the currently bound texture
+  // object)
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                  GL_LINEAR_MIPMAP_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  // load and generate the texture
+  unsigned char *dataStone =
+      stbi_load("C:\\Users\\rkmun\\source\\repos\\LearnOpenGL\\src\\stone.jpg", &width, &height, &nrChannels, 0);
+  if (dataStone) {
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
+                 GL_UNSIGNED_BYTE, dataStone);
+    glGenerateMipmap(GL_TEXTURE_2D);
+  } else {
+    printf("Failed to load texture\n%s", stbi_failure_reason());
+  }
+  stbi_image_free(dataStone);
+
+  unsigned int textureIron;
+  glGenTextures(1, &textureIron);
+  glBindTexture(GL_TEXTURE_2D, textureIron);
+  // set the texture wrapping/filtering options (on the currently bound texture
+  // object)
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                  GL_LINEAR_MIPMAP_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  // load and generate the texture
+  unsigned char *dataIron =
+      stbi_load("C:\\Users\\rkmun\\source\\repos\\LearnOpenGL\\src\\iron.jpg", &width, &height, &nrChannels, 0);
+  if (dataIron) {
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
+                 GL_UNSIGNED_BYTE, dataIron);
+    glGenerateMipmap(GL_TEXTURE_2D);
+  } else {
+    printf("Failed to load texture\n%s", stbi_failure_reason());
+  }
+  stbi_image_free(dataIron);
+
   
 
   
@@ -237,8 +314,6 @@ int main() {
     makeProjection(45.0f, 0.1f, 100.0f, &projection, (float)SCR_WIDTH,
                    (float)SCR_HEIGHT);
   
-  int projectionLoc = glGetUniformLocation(shader.ID, "projection");
-  glUniformMatrix4fv(projectionLoc, 1, GL_TRUE, &projection.m);
   // render loop
   // -----------
   while (!glfwWindowShouldClose(window)) {
@@ -258,9 +333,9 @@ int main() {
 
 
     // bind Texture
-    glBindTexture(GL_TEXTURE_2D, texture);
     
-    struct mat4 view;
+    
+    struct mat4 view = makeIdentityMatrix();
     
     addVectors(cameraPos, cameraFront, &lookVec);
     makeLookAtMatrix(cameraPos, lookVec, yAxis, &view);
@@ -279,8 +354,20 @@ int main() {
     for(unsigned int i = 0; i < worldSize; i++)
     {
       if (transforms[i].w != -1) {
+        if (transforms[i].w == 1) {
+          glBindTexture(GL_TEXTURE_2D, texture);
+        }
+        else if (transforms[i].w == 2) {
+          glBindTexture(GL_TEXTURE_2D, textureDirt);
+        }
+        else if (transforms[i].w == 3) {
+          glBindTexture(GL_TEXTURE_2D, textureStone);
+        }
+        else if (transforms[i].w == 4) {
+          glBindTexture(GL_TEXTURE_2D, textureIron);
+        }
         struct mat4 model = makeIdentityMatrix();
-        
+          
         struct v3 renderVector = {transforms[i].x, transforms[i].y, transforms[i].z};
         translate(renderVector, &model);
         int modelLoc = glGetUniformLocation(shader.ID, "model");
@@ -384,21 +471,30 @@ void processInput(GLFWwindow *window) {
   }
   if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
     newSeed(&seed);
-    createN3dArray(64, seed, worldMat);
+    createN3dArray(16, seed, worldMat);
+    int axisSize = 16;
     int counter = 0;
-    int axisSize = 64;
     for (int i = 0; i < axisSize; i++) {
       for (int j = 0; j < axisSize; j++) {
         for (int k = 0; k < axisSize; k++) {
           struct v4 currentVector;
-          currentVector.y = (float)i - 0.5f;
+          currentVector.x = (float)i - 0.5f;
           currentVector.z = (float)j - 0.5f;
-          currentVector.x = (float)k - 0.5f;
-          currentVector.w = 1.0f;
-          if (worldMat[i][j][k] != 1) {
-            currentVector.w = -1.0f; 
-          }
+          currentVector.y = (float)k - 0.5f;
+          currentVector.w = -1.0f;
           transforms[counter] = currentVector;
+          if (worldMat[i][j][k] == 2) {
+            transforms[counter].w = 2.0f;
+          }
+          else if (worldMat[i][j][k] == 3) {
+            transforms[counter].w = 3.0f;
+          }
+          else if (worldMat[i][j][k] == 4) {
+            transforms[counter].w = 4.0f;
+          }
+          else if (worldMat[i][j][k] == 1) {
+            transforms[counter].w = 1.0f;
+          }
           counter++;
         }
       }

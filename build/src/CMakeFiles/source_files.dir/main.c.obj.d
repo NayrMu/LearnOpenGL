@@ -19,6 +19,8 @@ src/CMakeFiles/source_files.dir/main.c.obj: \
  C:/msys64/ucrt64/include/sec_api/stdio_s.h \
  C:/msys64/ucrt64/include/math.h \
  C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/stdbool.h \
+ C:/msys64/ucrt64/include/string.h \
+ C:/msys64/ucrt64/include/sec_api/string_s.h \
  C:\Users\rkmun\source\repos\LearnOpenGL\src\stb_image.h \
  C:/msys64/ucrt64/include/stdlib.h \
  C:/msys64/ucrt64/include/corecrt_wstdlib.h \
