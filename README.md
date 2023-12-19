@@ -16,15 +16,15 @@ One day I will learn CMake, but today is not that day.
 
 ## Current Progress
 
-** 12/19/2023
+**12/19/2023**
 
-I've put the world map into a temporary data stucture of just a 3d grid. I brought in some more textures from online, and after applying some perlin noise and some basic rules ive got terrain generation!
+I've put the world map into a temporary data stucture of just a 3d grid. I brought in some more textures from online, and after applying some perlin noise and some basic rules I've got terrain generation!
 
 <img src='https://github.com/NayrMu/LearnOpenGL/blob/master/MineCloneV0.1.gif' title='Video Demo' width='' alt='Video Demo' />
 
 
 
-** 12/5/2023 **
+**12/5/2023**
 
 I've got a spinning cube with a brick texture, the z-filtering has not yet bee implemented and the faces are currently a little jacked up.
 
