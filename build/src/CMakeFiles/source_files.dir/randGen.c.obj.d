@@ -1,6 +1,7 @@
 src/CMakeFiles/source_files.dir/randGen.c.obj: \
  C:\Users\rkmun\source\repos\LearnOpenGL\src\randGen.c \
  C:\Users\rkmun\source\repos\LearnOpenGL\src\randGen.h \
+ C:\Users\rkmun\source\repos\LearnOpenGL\src\Voxel.h \
  C:/msys64/ucrt64/include/stdio.h \
  C:/msys64/ucrt64/include/corecrt_stdio_config.h \
  C:/msys64/ucrt64/include/corecrt.h C:/msys64/ucrt64/include/_mingw.h \

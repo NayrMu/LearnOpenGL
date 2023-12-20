@@ -10,6 +10,7 @@ add_executable(source_files
     "vMaths.h"
     "randGen.c"
     "randGen.h"
+    "Voxel.h"
 )
 
 

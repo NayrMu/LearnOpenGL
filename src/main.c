@@ -10,22 +10,32 @@
 #include "Shader.h"
 #include "vMaths.h"
 #include "randGen.h"
+#include "Voxel.h"
 
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void processInput(GLFWwindow *window);
 double calculateFPS(double elapsedTime, int *frameCount);
+void loadVectors(int axisSize, int offsetX, int offsetZ, struct chunk* chunk, struct v4* transform);
 
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-int worldMat[16][16][16];
-unsigned int seed = 3125123;
-struct v4 transforms[4096];
+int p[512];
 
-struct v3 cameraPos = {0.0f, 2.0f, 10.0f};
+struct chunk chunk1;
+unsigned int seed = 3125123;
+#define chunkSize 4096
+int axisSize = 16;
+struct v4 transforms[chunkSize];
+
+struct chunk chunks[49];
+struct v4 allTransforms[49][chunkSize];
+
+
+struct v3 cameraPos = {8.0f, 8.0f, 24.0f};
 struct v3 cameraFront = {0.0f, 0.0f, -1.0f};
 struct v3 cameraTarget = {0.0f, 0.0f, 0.0f};
 struct v3 lookDirection;
@@ -77,6 +87,15 @@ const char *fragmentShaderSouce =
     "}\n";
 
 int main() {
+  initPerlin(p);
+  
+  for (int i = 0; i < 49; ++i) {
+    chunks[i] = chunk1;
+    for (int j = 0; j < chunkSize; ++j) {
+      allTransforms[i][j] = transforms[j];
+    }
+  }
+
   // glfw: initialize and configure
   // ------------------------------
   glfwInit();
@@ -153,42 +172,23 @@ int main() {
   };
   
   
-  createN3dArray(16, seed, worldMat);
-  int worldSize = 4096;
-  int axisSize = 16;
   
-  int counter = 0;
-  for (int i = 0; i < axisSize; i++) {
-    for (int j = 0; j < axisSize; j++) {
-      for (int k = 0; k < axisSize; k++) {
-        struct v4 currentVector;
-        currentVector.x = (float)i - 0.5f;
-        currentVector.z = (float)j - 0.5f;
-        currentVector.y = (float)k - 0.5f;
-        currentVector.w = -1.0f;
-        transforms[counter] = currentVector;
-        if (worldMat[i][j][k] == 2) {
-          transforms[counter].w = 2.0f;
-        }
-        else if (worldMat[i][j][k] == 3) {
-          transforms[counter].w = 3.0f;
-        }
-        else if (worldMat[i][j][k] == 4) {
-          transforms[counter].w = 4.0f;
-        }
-        else if (worldMat[i][j][k] == 1) {
-          transforms[counter].w = 1.0f;
-        }
-        counter++;
+  
+  int gridSize = 7; // Adjust this according to your requirements
+
+  for (int row = 0; row < gridSize; row++) {
+      for (int col = 0; col < gridSize; col++) {
+          int offsetX = (col -3) * axisSize;  // Set the x-offset based on column
+          int offsetZ = (row -3) * axisSize;  // Set the z-offset based on row
+
+          // Load vectors for the current chunk with the calculated offsets
+          loadVectors(axisSize, offsetX, offsetZ, &chunks[row * gridSize + col], &allTransforms[row * gridSize + col][0]);
       }
-    }
   }
 
-  printf("%f %f %f\n%ff %f %f\n %f %f %f", transforms[0].x, transforms[0].y, transforms[0].z, transforms[1].x, transforms[1].y, transforms[1].z, transforms[2].x, transforms[2].y, transforms[2].z);
   unsigned int num1 = NoiseGen(1000, 9999, 1234567);
   unsigned int num2 = NoiseGen(1000, 9999, 9964921);
   unsigned int num3 = NoiseGen(1000, 9999, 92345678);
-  printf("%i %i %i", num1, num2, num3);
   unsigned int VBO, VAO;
   glGenVertexArrays(1, &VAO);
   glGenBuffers(1, &VBO);
@@ -330,7 +330,23 @@ int main() {
     glEnable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
+    for (int i = 0; i < 49; i++) {
+      int chunkOffsetX = chunks[i].offsetX / axisSize;
+      int playerOffsetX = (int)(cameraPos.x / axisSize);
+      int chunkOffsetZ = chunks[i].offsetZ / axisSize;
+      int playerOffsetZ = (int)(cameraPos.z / axisSize);
+      if (abs(playerOffsetX - chunkOffsetX) > 3) {
+        int newOffsetX = ((playerOffsetX % axisSize) + 3) * axisSize;
 
+        loadVectors(axisSize, newOffsetX, chunks[i].offsetZ, &chunks[i], &allTransforms[i][0]);
+      }
+      else if ((playerOffsetZ - chunkOffsetZ) > 3) {
+        int newOffsetZ = ((playerOffsetZ % axisSize) + 3) * axisSize;
+
+        loadVectors(axisSize, chunks[i].offsetX, newOffsetZ, &chunks[i], &allTransforms[i][0]);
+      }
+    }
+    
 
     // bind Texture
     
@@ -350,33 +366,37 @@ int main() {
     
     
     glBindVertexArray(VAO);
-    
-    for(unsigned int i = 0; i < worldSize; i++)
-    {
-      if (transforms[i].w != -1) {
-        if (transforms[i].w == 1) {
-          glBindTexture(GL_TEXTURE_2D, texture);
-        }
-        else if (transforms[i].w == 2) {
-          glBindTexture(GL_TEXTURE_2D, textureDirt);
-        }
-        else if (transforms[i].w == 3) {
-          glBindTexture(GL_TEXTURE_2D, textureStone);
-        }
-        else if (transforms[i].w == 4) {
-          glBindTexture(GL_TEXTURE_2D, textureIron);
-        }
-        struct mat4 model = makeIdentityMatrix();
+    for (int i = 0; i < 49; i++) {
+      for(unsigned int j = 0; j < chunkSize; j++)
+      {
+        if (allTransforms[i][j].w != -1) {
+          if (allTransforms[i][j].w == 1) {
+            glBindTexture(GL_TEXTURE_2D, texture);
+          }
+          else if (allTransforms[i][j].w == 2) {
+            glBindTexture(GL_TEXTURE_2D, textureDirt);
+          }
+          else if (allTransforms[i][j].w == 3) {
+            glBindTexture(GL_TEXTURE_2D, textureStone);
+          }
+          else if (allTransforms[i][j].w == 4) {
+            glBindTexture(GL_TEXTURE_2D, textureIron);
+          }
+          struct mat4 model = makeIdentityMatrix();
+            
+          struct v3 renderVector = {allTransforms[i][j].x + chunks[i].offsetX, allTransforms[i][j].y, allTransforms[i][j].z + chunks[i].offsetZ};
+          translate(renderVector, &model);
+          int modelLoc = glGetUniformLocation(shader.ID, "model");
           
-        struct v3 renderVector = {transforms[i].x, transforms[i].y, transforms[i].z};
-        translate(renderVector, &model);
-        int modelLoc = glGetUniformLocation(shader.ID, "model");
-        
-        glUniformMatrix4fv(modelLoc, 1, GL_TRUE, &model.m);
+          glUniformMatrix4fv(modelLoc, 1, GL_TRUE, &model.m);
 
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+          glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
       }
     }
+
+
+
 
     frameCount++;
 
@@ -433,7 +453,7 @@ void processInput(GLFWwindow *window) {
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS){
     glfwSetWindowShouldClose(window, 1);
   }
-  float cameraSpeed = 4.5f * deltaTime; // adjust accordingly
+  float cameraSpeed = 7.0f * deltaTime; // adjust accordingly
   struct v3 vecA;
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
     VscalarMulitply(cameraSpeed, cameraFront, &vecA);
@@ -458,10 +478,7 @@ void processInput(GLFWwindow *window) {
     addVectors(cameraPos, vecA, &cameraPos);
   }
   if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
-    crossProduct(cameraFront, xAxis, &vecA);
-    normalize3d(&vecA);
-    VscalarMulitply(cameraSpeed, vecA, &vecA);
-    addVectors(cameraPos, vecA, &cameraPos);
+    cameraSpeed = 2.5f * deltaTime;
   }
   if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
     crossProduct(cameraFront, xAxis, &vecA);
@@ -470,33 +487,17 @@ void processInput(GLFWwindow *window) {
     subtractVectors(cameraPos, vecA, &cameraPos);
   }
   if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
-    newSeed(&seed);
-    createN3dArray(16, seed, worldMat);
-    int axisSize = 16;
-    int counter = 0;
-    for (int i = 0; i < axisSize; i++) {
-      for (int j = 0; j < axisSize; j++) {
-        for (int k = 0; k < axisSize; k++) {
-          struct v4 currentVector;
-          currentVector.x = (float)i - 0.5f;
-          currentVector.z = (float)j - 0.5f;
-          currentVector.y = (float)k - 0.5f;
-          currentVector.w = -1.0f;
-          transforms[counter] = currentVector;
-          if (worldMat[i][j][k] == 2) {
-            transforms[counter].w = 2.0f;
-          }
-          else if (worldMat[i][j][k] == 3) {
-            transforms[counter].w = 3.0f;
-          }
-          else if (worldMat[i][j][k] == 4) {
-            transforms[counter].w = 4.0f;
-          }
-          else if (worldMat[i][j][k] == 1) {
-            transforms[counter].w = 1.0f;
-          }
-          counter++;
-        }
+    
+    initPerlin(p);
+    int gridSize = 7; // Adjust this according to your requirements
+
+    for (int row = 0; row < gridSize; row++) {
+      for (int col = 0; col < gridSize; col++) {
+        int offsetX = (col -3) * axisSize;  // Set the x-offset based on column
+        int offsetZ = (row -3) * axisSize;  // Set the z-offset based on row
+
+        // Load vectors for the current chunk with the calculated offsets
+        loadVectors(axisSize, offsetX, offsetZ, &chunks[row * gridSize + col], &allTransforms[row * gridSize + col][0]);
       }
     }
   }
@@ -548,4 +549,40 @@ double calculateFPS(double elapsedTime, int *frameCount) {
   double fps = (*frameCount) / elapsedTime;
   *frameCount = 0;
   return fps;
+}
+
+void loadVectors(int axisSize, int offsetX, int offsetZ, struct chunk* chunk, struct v4* transform) {
+  unsigned int seed;
+  chunk->offsetX = offsetX;
+  chunk->offsetZ = offsetZ;
+  newSeed(&seed);
+  createN3dArray(axisSize, seed, chunk, offsetX, offsetZ, p);
+  chunk->offsetX = offsetX;
+  chunk->offsetZ = offsetZ;
+  int counter = 0;
+  for (int i = 0; i < axisSize; i++) {
+    for (int j = 0; j < axisSize; j++) {
+      for (int k = 0; k < axisSize; k++) {
+        struct v4 currentVector;
+        currentVector.x = (float)i - 0.5f;
+        currentVector.z = (float)j - 0.5f;
+        currentVector.y = (float)k - 0.5f;
+        currentVector.w = -1.0f;
+        transform[counter] = currentVector;
+        if (chunk->m[i][j][k] == 2) {
+          transform[counter].w = 2.0f;
+        }
+        else if (chunk->m[i][j][k] == 3) {
+          transform[counter].w = 3.0f;
+        }
+        else if (chunk->m[i][j][k] == 4) {
+          transform[counter].w = 4.0f;
+        }
+        else if (chunk->m[i][j][k] == 1) {
+          transform[counter].w = 1.0f;
+        }
+        counter++;
+      }
+    }
+  }
 }

@@ -33,4 +33,5 @@ src/CMakeFiles/source_files.dir/main.c.obj: \
  C:/msys64/ucrt64/include/errno.h \
  C:\Users\rkmun\source\repos\LearnOpenGL\src\Shader.h \
  C:\Users\rkmun\source\repos\LearnOpenGL\src\vMaths.h \
- C:\Users\rkmun\source\repos\LearnOpenGL\src\randGen.h
+ C:\Users\rkmun\source\repos\LearnOpenGL\src\randGen.h \
+ C:\Users\rkmun\source\repos\LearnOpenGL\src\Voxel.h

@@ -36,8 +36,6 @@ void newSeed(unsigned int* seed) {
     *seed = rand() % 9999999;
 }
 
-int p[512];
-
 
 float fade(float t) {
     return t * t * t * (t * (t * 6 - 15) + 10);
@@ -54,7 +52,7 @@ float grad(int hash, float x, float y) {
     return (grad * x + grad * y); // Gradient times (x, y)
 }
 
-float perlin(float x, float y) {
+float perlin(float x, float y, int p[512]) {
     int X = (int)floor(x) & 255;
     int Y = (int)floor(y) & 255;
 
@@ -71,28 +69,27 @@ float perlin(float x, float y) {
                    lerp(u, grad(p[a + 1], x, y - 1), grad(p[b + 1], x - 1, y - 1)));
 }
 
-void initPerlin() {
+void initPerlin(int p[512]) {
     for (int i = 0; i < 256; i++) p[256 + i] = p[i] = rand() % 255;
 }
 
-void createN3dArray(int n, unsigned int seed, int gameWorld[16][16][16]) {
-
-    initPerlin();
-    memset(gameWorld, 0, sizeof(int) * 16 * 16 * 16);
+void createN3dArray(int n, unsigned int seed, struct chunk* chunk, int offsetX, int offsetZ, int p[512]) {
+    
+    memset(chunk->m, 0, sizeof(int) * 16 * 16 * 16);
 
     float rNum;
     int rNumNorm;
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
-            rNum = perlin((float)j * 0.1f + 0.1f, (float)i * 0.1f + 0.1f);
+            rNum = perlin((float)(j+offsetZ) * 0.1f + 0.1f, (float)(i+offsetX) * 0.1f + 0.1f, p);
             rNumNorm = (rNum + 1.0f) * 0.5f * 8.0f + 8.0f;
             for (int k = 0; k < n; k++) {
                 printf("%d\n", rNumNorm);
                 if (k > 5 && k < rNumNorm) {
-                    gameWorld[i][j][k] = 2;
+                    chunk->m[i][j][k] = 2;
                 }
                 else if (k <= 5) {
-                    gameWorld[i][j][k] = 3;
+                    chunk->m[i][j][k] = 3;
                 }
                 
             }
@@ -101,16 +98,16 @@ void createN3dArray(int n, unsigned int seed, int gameWorld[16][16][16]) {
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
             for (int k = 0; k < n; k++) {
-                if ((gameWorld[i][j][k-1] == 2 && gameWorld[i][j][k+1] == 0) || (k == 15 && gameWorld[i][j][k-1] == 2)) {
-                    gameWorld[i][j][k] = 1;
+                if ((chunk->m[i][j][k-1] == 2 && chunk->m[i][j][k+1] == 0) || (k == 15 && chunk->m[i][j][k-1] == 2)) {
+                    chunk->m[i][j][k] = 1;
                 }
-                else if (gameWorld[i][j][k+5] == 2) {
-                    gameWorld[i][j][k] = 3;
+                else if (chunk->m[i][j][k+5] == 2) {
+                    chunk->m[i][j][k] = 3;
                 }
-                else if (gameWorld[i][j][k] == 3) {
+                else if (chunk->m[i][j][k] == 3) {
                     int odds = rand() % 100 + 1;
                     if (odds > 80) {
-                        gameWorld[i][j][k] = 4;
+                        chunk->m[i][j][k] = 4;
                     }
                 }
             }
