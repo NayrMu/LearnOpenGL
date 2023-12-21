@@ -9,7 +9,7 @@ src/CMakeFiles/source_files.dir/Shader.c.obj: \
  C:/msys64/ucrt64/include/vadefs.h \
  C:/msys64/ucrt64/include/sdks/_mingw_ddk.h \
  C:/Users/rkmun/source/repos/LearnOpenGL/Dependencies/include/glad/glad.h \
- C:/Users/rkmun/source/repos/LearnOpenGL/Dependencies/include/KHR/khrplatform.h \
+ C:/msys64/ucrt64/include/KHR/khrplatform.h \
  C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/stdint.h \
  C:/msys64/ucrt64/include/stdint.h \
  C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/stddef.h \

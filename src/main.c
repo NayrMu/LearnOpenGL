@@ -62,16 +62,22 @@ const char *vertexShaderSource =
     "#version 330 core\n"
     "layout (location = 0) in vec3 aPos;\n"
     "layout (location = 1) in vec2 aTexCoord;\n"
+    "layout (location = 2) in mat4 instanceTransform;\n"
     "\n"
     "out vec2 TexCoord;\n"
     "\n"
-    "uniform mat4 model;\n"
     "uniform mat4 view;\n"
     "uniform mat4 projection;\n"
     "\n"
     "void main()\n"
     "{\n"
-    "    gl_Position = projection * view * model * vec4(aPos, 1.0);\n"
+    "    mat4 transposedInstanceTransform = mat4(\n"
+    "        instanceTransform[0][0], instanceTransform[1][0], instanceTransform[2][0], instanceTransform[3][0],\n"
+    "        instanceTransform[0][1], instanceTransform[1][1], instanceTransform[2][1], instanceTransform[3][1],\n"
+    "        instanceTransform[0][2], instanceTransform[1][2], instanceTransform[2][2], instanceTransform[3][2],\n"
+    "        instanceTransform[0][3], instanceTransform[1][3], instanceTransform[2][3], instanceTransform[3][3]\n"
+    "    );\n"
+    "    gl_Position = projection * view * transposedInstanceTransform * vec4(aPos, 1.0);\n"
     "    TexCoord = aTexCoord;\n"
     "}\n";
 const char *fragmentShaderSouce = 
@@ -98,6 +104,7 @@ int main() {
       allTransforms[i][j] = transforms[j];
     }
   }
+  struct mat4 instanceTransforms[chunkSize];
   
 
   // glfw: initialize and configure
@@ -189,10 +196,6 @@ int main() {
           loadVectors(axisSize, offsetX, offsetZ, &chunks[row * gridSize + col], &allTransforms[row * gridSize + col][0]);
       }
   }
-
-  unsigned int num1 = NoiseGen(1000, 9999, 1234567);
-  unsigned int num2 = NoiseGen(1000, 9999, 9964921);
-  unsigned int num3 = NoiseGen(1000, 9999, 92345678);
   unsigned int VBO, VAO;
   glGenVertexArrays(1, &VAO);
   glGenBuffers(1, &VBO);
@@ -211,16 +214,30 @@ int main() {
                         (void *)(3 * sizeof(float)));
   glEnableVertexAttribArray(1);
 
-  // Set up VBO for instance data
-  /*unsigned int instanceVBO;
-  glGenBuffers(1, &instanceVBO);
-  glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(instanceTransforms), instanceTransforms, GL_STATIC_DRAW);
 
-  // Set up VAO for instance data
-  glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
-  glEnableVertexAttribArray(2);
-  glVertexAttribDivisor(2, 1); // This makes sure the attribute advances once per instance*/
+  unsigned int instanceVBO;
+  int pos = 2;
+  glEnableVertexAttribArray(pos);
+  glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+
+  // Specify the format of the mat4 attribute data
+  glVertexAttribPointer(pos, 4, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 4 * 4, (void*)(0));
+
+  // Set up attribute pointers for each column of the mat4
+  for (int i = 1; i < 4; ++i) {
+      glVertexAttribPointer(pos + i, 4, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 4 * 4, (void*)(sizeof(float) * 4 * i));
+      glEnableVertexAttribArray(pos + i);
+      glVertexAttribDivisor(pos + i, 1);
+  }
+
+  // Set up the divisor for the entire mat4 (1 mat4 per instance)
+  glVertexAttribDivisor(pos, 1);
+
+  // Unbind the buffer
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+
+  
 
   // You can unbind the VAO afterwards so other VAO calls won't accidentally
   // modify this VAO, but this rarely happens. Modifying other VAOs requires a
@@ -230,7 +247,6 @@ int main() {
   // bind the VAO (it was already bound, but just to demonstrate): seeing as we
   // only have a single VAO we can just bind it beforehand before rendering the
   // respective triangle; this is another approach.
-  glBindVertexArray(VAO);
 
   unsigned int texture;
   glGenTextures(1, &texture);
@@ -390,34 +406,18 @@ int main() {
     
     
     glBindVertexArray(VAO);
-    for (int i = 0; i < worldSize; i++) {
-      for(unsigned int j = 0; j < chunkSize; j++)
-      {
-        if (allTransforms[i][j].w != -1) {
-          if (allTransforms[i][j].w == 1) {
-            glBindTexture(GL_TEXTURE_2D, texture);
-          }
-          else if (allTransforms[i][j].w == 2) {
-            glBindTexture(GL_TEXTURE_2D, textureDirt);
-          }
-          else if (allTransforms[i][j].w == 3) {
-            glBindTexture(GL_TEXTURE_2D, textureStone);
-          }
-          else if (allTransforms[i][j].w == 4) {
-            glBindTexture(GL_TEXTURE_2D, textureIron);
-          }
-          struct mat4 model = makeIdentityMatrix();
-            
-          struct v3 renderVector = {allTransforms[i][j].x + chunks[i].offsetX, allTransforms[i][j].y , allTransforms[i][j].z + chunks[i].offsetZ};
-          translate(renderVector, &model);
-          int modelLoc = glGetUniformLocation(shader.ID, "model");
+    glBindTexture(GL_TEXTURE_2D, texture);
+    for(unsigned int j = 0; j < chunkSize; j++)
+    {
+      if (allTransforms[0][j].w != -1) {
+        struct mat4 model = makeIdentityMatrix();
           
-          glUniformMatrix4fv(modelLoc, 1, GL_TRUE, &model.m);
-
-          glDrawArrays(GL_TRIANGLES, 0, 36);
-        }
+        struct v3 renderVector = {allTransforms[0][j].x + chunks[0].offsetX, allTransforms[0][j].y , allTransforms[0][j].z + chunks[0].offsetZ};
+        translate(renderVector, &model);
+        instanceTransforms[j] = model;
       }
     }
+    glDrawArraysInstanced(GL_TRIANGLES, 0, 36, chunkSize);
 
 
 

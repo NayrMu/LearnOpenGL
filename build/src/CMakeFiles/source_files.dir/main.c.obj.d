@@ -1,7 +1,7 @@
 src/CMakeFiles/source_files.dir/main.c.obj: \
  C:\Users\rkmun\source\repos\LearnOpenGL\src\main.c \
  C:/Users/rkmun/source/repos/LearnOpenGL/Dependencies/include/glad/glad.h \
- C:/Users/rkmun/source/repos/LearnOpenGL/Dependencies/include/KHR/khrplatform.h \
+ C:/msys64/ucrt64/include/KHR/khrplatform.h \
  C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/stdint.h \
  C:/msys64/ucrt64/include/stdint.h C:/msys64/ucrt64/include/crtdefs.h \
  C:/msys64/ucrt64/include/corecrt.h C:/msys64/ucrt64/include/_mingw.h \

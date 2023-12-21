@@ -40,8 +40,8 @@ src/CMakeFiles/source_files.dir/STBIMAGE.c.obj: C:/Users/rkmun/source/repos/Lear
   C:/Users/rkmun/source/repos/LearnOpenGL/src/stb_image.h
 
 src/CMakeFiles/source_files.dir/Shader.c.obj: C:/Users/rkmun/source/repos/LearnOpenGL/src/Shader.c \
-  C:/Users/rkmun/source/repos/LearnOpenGL/Dependencies/include/KHR/khrplatform.h \
   C:/Users/rkmun/source/repos/LearnOpenGL/Dependencies/include/glad/glad.h \
+  C:/msys64/ucrt64/include/KHR/khrplatform.h \
   C:/msys64/ucrt64/include/_mingw.h \
   C:/msys64/ucrt64/include/_mingw_mac.h \
   C:/msys64/ucrt64/include/_mingw_off_t.h \
@@ -74,8 +74,8 @@ src/CMakeFiles/source_files.dir/Shader.c.obj: C:/Users/rkmun/source/repos/LearnO
   C:/Users/rkmun/source/repos/LearnOpenGL/src/vMaths.h
 
 src/CMakeFiles/source_files.dir/glad.c.obj: C:/Users/rkmun/source/repos/LearnOpenGL/src/glad.c \
-  C:/Users/rkmun/source/repos/LearnOpenGL/Dependencies/include/KHR/khrplatform.h \
   C:/Users/rkmun/source/repos/LearnOpenGL/Dependencies/include/glad/glad.h \
+  C:/msys64/ucrt64/include/KHR/khrplatform.h \
   C:/msys64/ucrt64/include/_bsd_types.h \
   C:/msys64/ucrt64/include/_mingw.h \
   C:/msys64/ucrt64/include/_mingw_mac.h \
@@ -347,8 +347,8 @@ src/CMakeFiles/source_files.dir/glad.c.obj: C:/Users/rkmun/source/repos/LearnOpe
 
 src/CMakeFiles/source_files.dir/main.c.obj: C:/Users/rkmun/source/repos/LearnOpenGL/src/main.c \
   C:/Users/rkmun/source/repos/LearnOpenGL/Dependencies/include/GLFW/glfw3.h \
-  C:/Users/rkmun/source/repos/LearnOpenGL/Dependencies/include/KHR/khrplatform.h \
   C:/Users/rkmun/source/repos/LearnOpenGL/Dependencies/include/glad/glad.h \
+  C:/msys64/ucrt64/include/KHR/khrplatform.h \
   C:/msys64/ucrt64/include/_mingw.h \
   C:/msys64/ucrt64/include/_mingw_mac.h \
   C:/msys64/ucrt64/include/_mingw_off_t.h \
@@ -530,6 +530,8 @@ C:/msys64/ucrt64/include/stdint.h:
 
 C:/msys64/ucrt64/include/combaseapi.h:
 
+C:/msys64/ucrt64/include/KHR/khrplatform.h:
+
 C:/msys64/ucrt64/include/swprintf.inl:
 
 C:/Users/rkmun/source/repos/LearnOpenGL/Dependencies/include/glad/glad.h:
@@ -547,8 +549,6 @@ C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/emmintrin.h:
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/xmmintrin.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/limits.h:
-
-C:/Users/rkmun/source/repos/LearnOpenGL/Dependencies/include/KHR/khrplatform.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/mm_malloc.h:
 
