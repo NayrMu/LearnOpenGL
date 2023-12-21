@@ -16,8 +16,14 @@ One day I will learn CMake, but today is not that day.
 
 ## Current Progress
 
-**12/19/2023**
+**12/20/2023**
+~45 hours
+I've got infinite world generation in all directions, needs optimization as it is rendering at about 5fps on a heft computer.
 
+<img src='https://github.com/NayrMu/LearnOpenGL/blob/master/MineCloneV0.2.gif' title='Video Demo' width='' alt='Video Demo' />
+
+**12/19/2023**
+~38 hours
 I've put the world map into a temporary data stucture of just a 3d grid. I brought in some more textures from online, and after applying some perlin noise and some basic rules I've got terrain generation!
 
 <img src='https://github.com/NayrMu/LearnOpenGL/blob/master/MineCloneV0.1.gif' title='Video Demo' width='' alt='Video Demo' />
