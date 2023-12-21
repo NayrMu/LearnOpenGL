@@ -30,12 +30,13 @@ unsigned int seed = 3125123;
 #define chunkSize 4096
 int axisSize = 16;
 struct v4 transforms[chunkSize];
+int worldWidth = 15;
+int worldRad;
+struct chunk chunks[225];
+struct v4 allTransforms[225][chunkSize];
 
-struct chunk chunks[49];
-struct v4 allTransforms[49][chunkSize];
 
-
-struct v3 cameraPos = {8.0f, 8.0f, 24.0f};
+struct v3 cameraPos = {8.0f, 50.0f, 8.0f};
 struct v3 cameraFront = {0.0f, 0.0f, -1.0f};
 struct v3 cameraTarget = {0.0f, 0.0f, 0.0f};
 struct v3 lookDirection;
@@ -89,12 +90,15 @@ const char *fragmentShaderSouce =
 int main() {
   initPerlin(p);
   
-  for (int i = 0; i < 49; ++i) {
+  int worldSize = (worldWidth * worldWidth);
+  int worldRad = worldWidth / 2;
+  for (int i = 0; i < worldSize; ++i) {
     chunks[i] = chunk1;
     for (int j = 0; j < chunkSize; ++j) {
       allTransforms[i][j] = transforms[j];
     }
   }
+  
 
   // glfw: initialize and configure
   // ------------------------------
@@ -174,12 +178,12 @@ int main() {
   
   
   
-  int gridSize = 7; // Adjust this according to your requirements
+  int gridSize = worldWidth; // Adjust this according to your requirements
 
   for (int row = 0; row < gridSize; row++) {
       for (int col = 0; col < gridSize; col++) {
-          int offsetX = (col -3) * axisSize;  // Set the x-offset based on column
-          int offsetZ = (row -3) * axisSize;  // Set the z-offset based on row
+          int offsetX = (col -worldRad) * axisSize;  // Set the x-offset based on column
+          int offsetZ = (row -worldRad) * axisSize;  // Set the z-offset based on row
 
           // Load vectors for the current chunk with the calculated offsets
           loadVectors(axisSize, offsetX, offsetZ, &chunks[row * gridSize + col], &allTransforms[row * gridSize + col][0]);
@@ -207,6 +211,16 @@ int main() {
                         (void *)(3 * sizeof(float)));
   glEnableVertexAttribArray(1);
 
+  // Set up VBO for instance data
+  /*unsigned int instanceVBO;
+  glGenBuffers(1, &instanceVBO);
+  glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(instanceTransforms), instanceTransforms, GL_STATIC_DRAW);
+
+  // Set up VAO for instance data
+  glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+  glEnableVertexAttribArray(2);
+  glVertexAttribDivisor(2, 1); // This makes sure the attribute advances once per instance*/
 
   // You can unbind the VAO afterwards so other VAO calls won't accidentally
   // modify this VAO, but this rarely happens. Modifying other VAOs requires a
@@ -329,22 +343,32 @@ int main() {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);\
     glEnable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
-    for (int i = 0; i < 49; i++) {
+    for (int i = 0; i < worldSize; i++) {
       int chunkOffsetX = chunks[i].offsetX / axisSize;
-      int playerOffsetX = (int)(cameraPos.x / axisSize);
+      int playerOffsetX = ((int)(cameraPos.x / axisSize));
       int chunkOffsetZ = chunks[i].offsetZ / axisSize;
-      int playerOffsetZ = (int)(cameraPos.z / axisSize);
-      if (abs(playerOffsetX - chunkOffsetX) > 3) {
-        int newOffsetX = ((playerOffsetX % axisSize) + 3) * axisSize;
-
+      int playerOffsetZ = ((int)(cameraPos.z / axisSize));
+      int newOffsetX;
+      int newOffsetZ;
+      if (abs(playerOffsetX - chunkOffsetX) > worldRad) {
+        if (chunkOffsetX > (int)(cameraPos.x / axisSize)) {
+          newOffsetX = ((int)(cameraPos.x / axisSize) - worldRad) * axisSize;
+        }
+        else {
+          newOffsetX = (playerOffsetX + worldRad) * axisSize;
+        }
         loadVectors(axisSize, newOffsetX, chunks[i].offsetZ, &chunks[i], &allTransforms[i][0]);
       }
-      else if ((playerOffsetZ - chunkOffsetZ) > 3) {
-        int newOffsetZ = ((playerOffsetZ % axisSize) + 3) * axisSize;
-
+      else if (abs(playerOffsetZ - chunkOffsetZ) > worldRad) {
+        if (chunkOffsetZ > (int)(cameraPos.z / axisSize)) {
+          newOffsetZ = ((int)(cameraPos.z / axisSize) - worldRad) * axisSize;
+        }
+        else {
+          newOffsetZ = (playerOffsetZ + worldRad) * axisSize;
+        }
         loadVectors(axisSize, chunks[i].offsetX, newOffsetZ, &chunks[i], &allTransforms[i][0]);
       }
+      
     }
     
 
@@ -366,7 +390,7 @@ int main() {
     
     
     glBindVertexArray(VAO);
-    for (int i = 0; i < 49; i++) {
+    for (int i = 0; i < worldSize; i++) {
       for(unsigned int j = 0; j < chunkSize; j++)
       {
         if (allTransforms[i][j].w != -1) {
@@ -384,7 +408,7 @@ int main() {
           }
           struct mat4 model = makeIdentityMatrix();
             
-          struct v3 renderVector = {allTransforms[i][j].x + chunks[i].offsetX, allTransforms[i][j].y, allTransforms[i][j].z + chunks[i].offsetZ};
+          struct v3 renderVector = {allTransforms[i][j].x + chunks[i].offsetX, allTransforms[i][j].y , allTransforms[i][j].z + chunks[i].offsetZ};
           translate(renderVector, &model);
           int modelLoc = glGetUniformLocation(shader.ID, "model");
           
@@ -453,7 +477,7 @@ void processInput(GLFWwindow *window) {
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS){
     glfwSetWindowShouldClose(window, 1);
   }
-  float cameraSpeed = 7.0f * deltaTime; // adjust accordingly
+  float cameraSpeed = 20.0f * deltaTime; // adjust accordingly
   struct v3 vecA;
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
     VscalarMulitply(cameraSpeed, cameraFront, &vecA);
@@ -489,12 +513,12 @@ void processInput(GLFWwindow *window) {
   if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
     
     initPerlin(p);
-    int gridSize = 7; // Adjust this according to your requirements
+    int gridSize = worldWidth; // Adjust this according to your requirements
 
     for (int row = 0; row < gridSize; row++) {
       for (int col = 0; col < gridSize; col++) {
-        int offsetX = (col -3) * axisSize;  // Set the x-offset based on column
-        int offsetZ = (row -3) * axisSize;  // Set the z-offset based on row
+        int offsetX = (col -worldRad) * axisSize;  // Set the x-offset based on column
+        int offsetZ = (row -worldRad) * axisSize;  // Set the z-offset based on row
 
         // Load vectors for the current chunk with the calculated offsets
         loadVectors(axisSize, offsetX, offsetZ, &chunks[row * gridSize + col], &allTransforms[row * gridSize + col][0]);
@@ -557,8 +581,6 @@ void loadVectors(int axisSize, int offsetX, int offsetZ, struct chunk* chunk, st
   chunk->offsetZ = offsetZ;
   newSeed(&seed);
   createN3dArray(axisSize, seed, chunk, offsetX, offsetZ, p);
-  chunk->offsetX = offsetX;
-  chunk->offsetZ = offsetZ;
   int counter = 0;
   for (int i = 0; i < axisSize; i++) {
     for (int j = 0; j < axisSize; j++) {

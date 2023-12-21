@@ -84,7 +84,6 @@ void createN3dArray(int n, unsigned int seed, struct chunk* chunk, int offsetX, 
             rNum = perlin((float)(j+offsetZ) * 0.1f + 0.1f, (float)(i+offsetX) * 0.1f + 0.1f, p);
             rNumNorm = (rNum + 1.0f) * 0.5f * 8.0f + 8.0f;
             for (int k = 0; k < n; k++) {
-                printf("%d\n", rNumNorm);
                 if (k > 5 && k < rNumNorm) {
                     chunk->m[i][j][k] = 2;
                 }
